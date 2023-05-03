@@ -8,13 +8,15 @@ const brushSize = 10;
 
 const image = new Image();
 
-const loadImage = () => {
-  // image.src = "https://picsum.photos/200/300";
-  // image.onload = () => {
-  //   if (ctx.value) {
-  //     ctx.value.drawImage(image, 0, 0);
-  //   }
-  // };
+const loadImage = (event: Event) => {
+  console.log(event);
+  const file = (event.target as HTMLInputElement).files?.[0] as File;
+  image.src = URL.createObjectURL(file);
+  image.onload = () => {
+    if (ctx.value) {
+      ctx.value.drawImage(image, 0, 0);
+    }
+  };
 };
 
 const draw = (x: number, y: number) => {
@@ -53,4 +55,5 @@ onMounted(() => {
 
   <!-- <button @click="draw">Draww</button> -->
   <button @click="loadImage" class="btn">Load Image</button>
+  <input type="file" accept="image/*" @change="loadImage" />
 </template>
