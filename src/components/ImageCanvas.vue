@@ -4,7 +4,7 @@ import { ref, onMounted } from "vue";
 const canvas = ref<HTMLCanvasElement | null>(null);
 const ctx = ref<CanvasRenderingContext2D | null>(null);
 let isDrawing = false;
-const brushSize = 10;
+const brushSize = 20;
 
 const image = new Image();
 
@@ -17,6 +17,13 @@ const loadImage = (event: Event) => {
       ctx.value.drawImage(image, 0, 0);
     }
   };
+};
+
+const saveImage = () => {
+  const link = document.createElement("a");
+  link.download = "image.png";
+  link.href = canvas.value?.toDataURL() || "";
+  link.click();
 };
 
 const draw = (x: number, y: number) => {
@@ -54,6 +61,6 @@ onMounted(() => {
   <canvas ref="canvas" width="500" height="500"></canvas>
 
   <!-- <button @click="draw">Draww</button> -->
-  <button @click="loadImage" class="btn">Load Image</button>
   <input type="file" accept="image/*" @change="loadImage" />
+  <button @click="saveImage">Save</button>
 </template>
