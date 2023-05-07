@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from "vue-router";
+import TopNavigation from "./components/TopNavigation.vue";
 </script>
 
 <template>
-  <nav>
-    <RouterLink to="/">Home</RouterLink>
-    <RouterLink to="/about">About</RouterLink>
-  </nav>
+  <TopNavigation />
 
   <RouterView />
 </template>
