@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { useUserCookieStore } from "@/stores/userCookie";
+import cookies from "js-cookie";
 
 const userCookie = useUserCookieStore();
 
 function logout() {
   userCookie.removeAuthCookie();
+  cookies.remove("auth-token");
 }
 </script>
 

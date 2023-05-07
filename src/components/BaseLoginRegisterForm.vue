@@ -26,8 +26,18 @@ function submit(name: string, password: string) {
 
 <template>
   <form @submit.prevent="submit(name, password)" class="flex flex-col gap-4 w-full max-w-xs">
-    <BaseFormControl :label="'Your name'" :placeholder="'Name'" v-model="name" />
-    <BaseFormControl :label="'Your password'" :placeholder="'Password'" v-model="password" />
+    <BaseFormControl
+      :label="'Your name'"
+      :placeholder="'Name'"
+      :input-type="'text'"
+      v-model="name"
+    />
+    <BaseFormControl
+      :label="'Your password'"
+      :placeholder="'Password'"
+      :input-type="'password'"
+      v-model="password"
+    />
     <button class="btn w-full btn-primary text-base mt-6">{{ props.ctaLabel }}</button>
   </form>
 </template>
