@@ -2,6 +2,7 @@
 const props = defineProps<{
   label: string;
   placeholder: string;
+  modelValue: string;
 }>();
 </script>
 
@@ -14,6 +15,8 @@ const props = defineProps<{
       type="text"
       :placeholder="props.placeholder"
       class="input input-bordered w-full max-w-xs"
+      :value="props.modelValue"
+      @input="$emit('update:modelValue', $event.target.value)"
     />
   </div>
 </template>
