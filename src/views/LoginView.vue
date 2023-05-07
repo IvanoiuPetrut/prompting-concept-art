@@ -1,10 +1,25 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { login } from "@/services/auth";
 import BaseLoginRegisterForm from "@/components/BaseLoginRegisterForm.vue";
+import BaseWarning from "@/components/BaseWarning.vue";
+
+const error = ref<string | null>(null);
+const timer = ref<number>(0);
+
+function handleError(newError: string) {
+  clearTimeout(timer.value);
+  timer.value = setTimeout(() => {
+    error.value = null;
+  }, 3500);
+  error.value = newError;
+}
 </script>
 
 <template>
+  <BaseWarning v-if="error" :message="error" />
   <div class="container mx-auto max-w-xs mt-32 bg-base-200 px-4 py-6 rounded-lg shadow-lg">
     <h1 class="text-3xl font-bold text-center mb-8">Welcome back</h1>
-    <BaseLoginRegisterForm :cta-label="'Log in'" />
+    <BaseLoginRegisterForm :cta-label="'Log in'" :submitFunction="login" @error="handleError" />
   </div>
 </template>
