@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
+import cookies from "js-cookie";
+import { useUserCookieStore } from "../stores/userCookie";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -8,11 +10,6 @@ const router = createRouter({
       path: "/",
       name: "home",
       component: HomeView
-    },
-    {
-      path: "/about",
-      name: "about",
-      component: () => import("../views/AboutView.vue")
     },
     {
       path: "/login",
@@ -25,6 +22,17 @@ const router = createRouter({
       component: () => import("../views/RegisterView.vue")
     }
   ]
+});
+
+router.beforeEach(() => {
+  const userCookieStore = useUserCookieStore();
+  const authCookie = cookies.get("auth-token");
+
+  if (authCookie) {
+    userCookieStore.setAuthCookie(authCookie);
+  } else {
+    userCookieStore.removeAuthCookie();
+  }
 });
 
 export default router;

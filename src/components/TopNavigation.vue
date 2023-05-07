@@ -1,3 +1,13 @@
+<script setup lang="ts">
+import { useUserCookieStore } from "@/stores/userCookie";
+
+const userCookie = useUserCookieStore();
+
+function logout() {
+  userCookie.removeAuthCookie();
+}
+</script>
+
 <template>
   <div class="navbar bg-base-200">
     <div class="flex-1">
@@ -8,8 +18,15 @@
     </div>
     <div class="flex-none">
       <ul class="menu menu-horizontal px-1 gap-3">
-        <li><RouterLink :to="{ name: 'login' }">Login</RouterLink></li>
-        <li><RouterLink :to="{ name: 'register' }">Register</RouterLink></li>
+        <li v-if="!userCookie.isUserAuthenticated">
+          <RouterLink :to="{ name: 'login' }">Login</RouterLink>
+        </li>
+        <li v-if="!userCookie.isUserAuthenticated">
+          <RouterLink :to="{ name: 'register' }">Register</RouterLink>
+        </li>
+        <li v-if="userCookie.isUserAuthenticated">
+          <button class="btn btn-ghost" @click="logout">Logout</button>
+        </li>
       </ul>
     </div>
   </div>

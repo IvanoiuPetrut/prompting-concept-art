@@ -3,6 +3,7 @@ import { ref } from "vue";
 import { register } from "@/services/auth";
 import BaseLoginRegisterForm from "@/components/BaseLoginRegisterForm.vue";
 import BaseWarning from "@/components/BaseWarning.vue";
+import router from "@/router";
 
 const error = ref<string | null>(null);
 const timer = ref<number>(0);
@@ -13,6 +14,10 @@ function handleError(newError: string) {
     error.value = null;
   }, 3500);
   error.value = newError;
+}
+
+function handleSuccess(data: { token: string }) {
+  router.push("/login");
 }
 </script>
 
@@ -25,6 +30,7 @@ function handleError(newError: string) {
       :cta-label="'Create account'"
       :submitFunction="register"
       @error="handleError"
+      @success="handleSuccess"
     />
   </div>
 </template>

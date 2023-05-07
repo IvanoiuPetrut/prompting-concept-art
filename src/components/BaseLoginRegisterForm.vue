@@ -16,11 +16,9 @@ function submit(name: string, password: string) {
   props
     .submitFunction(name, password)
     .then((data) => {
-      console.log(data);
       emit("success", data);
     })
     .catch((error) => {
-      console.log(error);
       emit("error", error);
     });
 }
