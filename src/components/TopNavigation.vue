@@ -11,7 +11,7 @@ function logout() {
 </script>
 
 <template>
-  <div class="navbar bg-base-200">
+  <div class="navbar bg-base-100 fixed w-full z-10 top-0">
     <div class="flex-1">
       <RouterLink :to="{ name: 'home' }" class="btn btn-ghost normal-case text-3xl font-bold"
         ><span class="text-primary">prompt</span>
