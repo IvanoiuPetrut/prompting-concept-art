@@ -1,3 +1,10 @@
+<script setup lang="ts">
+import { ref } from "vue";
+
+defineEmits(["load-image", "generate-image"]);
+const prompt = ref<string>("");
+</script>
+
 <template>
   <h1 class="text-5xl font-semibold text-center mb-20">
     Choose a way to start <strong class="text-primary">creating</strong>
@@ -9,8 +16,9 @@
           type="text"
           placeholder="Enter a prompt"
           class="input input-bordered input-primary w-full max-w-xs"
+          v-model="prompt"
         />
-        <button class="btn btn-primary">Enter</button>
+        <button class="btn btn-primary" @click="$emit('generate-image', prompt)">Generate</button>
       </div>
     </div>
     <div class="divider lg:divider-horizontal">OR</div>
@@ -18,6 +26,7 @@
       <input
         type="file"
         class="file-input file-input-bordered file-input-primary w-full max-w-xs"
+        @change="$emit('load-image', $event)"
       />
     </div>
   </div>
