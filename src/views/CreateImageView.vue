@@ -2,9 +2,11 @@
 import { ref } from "vue";
 import ImageCanvas from "../components/ImageCanvas.vue";
 import GetImage from "@/components/GetImage.vue";
+import { getGeneratedImage } from "@/services/images";
 
 const fileState = ref<"not-loaded" | "loading" | "loaded">("not-loaded");
 const file = ref<File | null>(null);
+const fileUrl = ref<string | null>(null);
 
 const handleLoadImage = (event: Event) => {
   file.value = (event.target as HTMLInputElement).files?.[0] as File;
@@ -13,10 +15,14 @@ const handleLoadImage = (event: Event) => {
   }
 };
 
-const handleGenerateImage = (prompt: string) => {
+async function handleGenerateImage(prompt: string) {
   fileState.value = "loading";
-  console.log(prompt);
-};
+  const { imageUrl, width, height } = await getGeneratedImage(prompt);
+  console.log(imageUrl, width, height);
+  fileUrl.value = imageUrl;
+  // file.value = imageUrl;
+  fileState.value = "loaded";
+}
 </script>
 
 <template>
@@ -27,6 +33,6 @@ const handleGenerateImage = (prompt: string) => {
       @generate-image="handleGenerateImage"
     />
     <div v-if="fileState === 'loading'">Spinning</div>
-    <ImageCanvas v-if="fileState === 'loaded'" :file="file" />
+    <ImageCanvas v-if="fileState === 'loaded'" :file="file" :imageUrl="fileUrl" />
   </div>
 </template>

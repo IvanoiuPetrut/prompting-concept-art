@@ -5,7 +5,9 @@ import router from "@/router";
 import { login } from "@/services/auth";
 import BaseLoginRegisterForm from "@/components/BaseLoginRegisterForm.vue";
 import BaseWarning from "@/components/BaseWarning.vue";
+import { useUserCookieStore } from "@/stores/userCookie";
 
+const userCookieStore = useUserCookieStore();
 const error = ref<string | null>(null);
 const timer = ref<number>(0);
 
@@ -17,8 +19,9 @@ function handleError(newError: string) {
   error.value = newError;
 }
 
-function handleSuccess(data: { token: string }) {
+function handleSuccess(data: { token: string; userId: string }) {
   cookies.set("auth-token", data.token, { expires: 1, sameSite: "strict" });
+  userCookieStore.setUserId(data.userId);
   router.push("/");
 }
 </script>

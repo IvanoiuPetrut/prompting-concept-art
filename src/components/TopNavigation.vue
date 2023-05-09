@@ -6,6 +6,7 @@ const userCookie = useUserCookieStore();
 
 function logout() {
   userCookie.removeAuthCookie();
+  userCookie.removeUserId();
   cookies.remove("auth-token");
 }
 </script>

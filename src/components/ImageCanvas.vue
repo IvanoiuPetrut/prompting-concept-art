@@ -2,7 +2,8 @@
 import { ref, onMounted } from "vue";
 
 const props = defineProps<{
-  file: File | null;
+  file?: File | null;
+  imageUrl?: string | null;
 }>();
 
 const canvas = ref<HTMLCanvasElement | null>(null);
@@ -26,10 +27,28 @@ const draw = (x: number, y: number) => {
   }
 };
 
+const image = new Image();
+
+if (props.imageUrl) {
+  image.src = props.imageUrl;
+  image.onload = () => {
+    if (ctx.value) {
+      ctx.value.drawImage(image, 0, 0);
+    }
+  };
+}
+
+if (props.file) {
+  image.src = URL.createObjectURL(props.file);
+  image.onload = () => {
+    if (ctx.value) {
+      ctx.value.drawImage(image, 0, 0);
+    }
+  };
+}
+
 onMounted(() => {
   const screenWidth = window.innerWidth;
-  const screenHeight = window.innerHeight;
-  console.log(screenWidth, screenHeight);
 
   if (canvas.value) {
     if (screenWidth < 768) {
@@ -46,7 +65,6 @@ onMounted(() => {
     canvas.value.addEventListener("mousedown", (e) => {
       if (canvas.value) {
         isDrawing = true;
-        console.log(e);
       }
     });
 
@@ -63,19 +81,16 @@ onMounted(() => {
     });
   }
 });
-
-const image = new Image();
-if (props.file) {
-  image.src = URL.createObjectURL(props.file);
-  image.onload = () => {
-    if (ctx.value) {
-      ctx.value.drawImage(image, 0, 0);
-    }
-  };
-}
 </script>
 
 <template>
-  <canvas ref="canvas" class="ring ring-primary ring-offset-base-100 ring-offset-4"></canvas>
-  <button @click="saveImage">Save</button>
+  <div class="grid grid-cols-2 gap-4">
+    <canvas ref="canvas" class="ring ring-primary ring-offset-base-100 ring-offset-4"></canvas>
+    <div class="flex justify-center gap-4 mt-4">
+      <button class="btn" @click="saveImage">Save</button>
+      <button class="btn" @click="saveImage">Save</button>
+      <button class="btn" @click="saveImage">Save</button>
+      <button class="btn" @click="saveImage">Save</button>
+    </div>
+  </div>
 </template>
