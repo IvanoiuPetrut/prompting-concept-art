@@ -2,13 +2,16 @@
 import { ref } from "vue";
 import ImageCanvas from "../components/ImageCanvas.vue";
 import GetImage from "@/components/GetImage.vue";
+import BaseSpinner from "@/components/BaseSpinner.vue";
+import FactSection from "@/components/FactSection.vue";
+import cryptoRandomString from "crypto-random-string";
+import artFacts from "@/data/artFacts.json";
 import { useImageStore } from "@/stores/image";
 import { getGeneratedImage } from "@/services/images";
-import cryptoRandomString from "crypto-random-string";
 
 const imageStore = useImageStore();
 
-const fileState = ref<"not-loaded" | "loading" | "loaded">("not-loaded");
+const fileState = ref<"not-loaded" | "loading" | "loaded">("loading");
 const file = ref<File | null>(null);
 const fileUrl = ref<string | null>(null);
 
@@ -41,7 +44,16 @@ async function handleGenerateImage(prompt: string) {
       @load-image="handleLoadImage"
       @generate-image="handleGenerateImage"
     />
-    <div v-if="fileState === 'loading'">Spinning</div>
+    <div v-if="fileState === 'loading'" class="mt-32 lg:px-64">
+      <BaseSpinner />
+      <FactSection class="mt-12">
+        <template #content>
+          <p class="text-xl px-12">
+            {{ artFacts.facts[Math.floor(Math.random() * artFacts.facts.length)] }}
+          </p>
+        </template>
+      </FactSection>
+    </div>
     <ImageCanvas v-if="fileState === 'loaded'" :file="file" :imageUrl="fileUrl" />
   </div>
 </template>
