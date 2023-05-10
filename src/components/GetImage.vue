@@ -6,10 +6,10 @@ const prompt = ref<string>("");
 </script>
 
 <template>
-  <h1 class="text-5xl font-semibold text-center mb-20">
+  <h1 class="text-5xl text-center font-semibold mb-20">
     Choose a way to start <strong class="text-primary">creating</strong>
   </h1>
-  <div class="flex flex-col w-1/2 mx-auto border-opacity-50 lg:flex-row">
+  <div class="flex flex-col justify-between w-1/2 mx-auto border-opacity-50 lg:flex-row">
     <div class="grid h-20 card rounded-box place-items-center">
       <div class="flex gap-2">
         <input

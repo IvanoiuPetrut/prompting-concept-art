@@ -2,7 +2,10 @@
 import { ref } from "vue";
 import ImageCanvas from "../components/ImageCanvas.vue";
 import GetImage from "@/components/GetImage.vue";
+import { useImageStore } from "@/stores/image";
 import { getGeneratedImage } from "@/services/images";
+
+const imageStore = useImageStore();
 
 const fileState = ref<"not-loaded" | "loading" | "loaded">("not-loaded");
 const file = ref<File | null>(null);
@@ -11,16 +14,17 @@ const fileUrl = ref<string | null>(null);
 const handleLoadImage = (event: Event) => {
   file.value = (event.target as HTMLInputElement).files?.[0] as File;
   if (file.value) {
+    imageStore.name = `${file.value.name.split(".")[0]}imageType=base.jpg`;
     fileState.value = "loaded";
   }
 };
 
 async function handleGenerateImage(prompt: string) {
   fileState.value = "loading";
-  const { imageUrl, width, height } = await getGeneratedImage(prompt);
-  console.log(imageUrl, width, height);
+  const { imageUrl, name } = await getGeneratedImage(prompt);
+  console.log(imageUrl, name);
+  imageStore.name = name;
   fileUrl.value = imageUrl;
-  // file.value = imageUrl;
   fileState.value = "loaded";
 }
 </script>

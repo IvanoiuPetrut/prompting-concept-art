@@ -1,12 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import BaseCollapse from "@/components/BaseCollapse.vue";
+import { useImageStore } from "@/stores/image";
+import { postImage } from "@/services/images";
+import { dataURLToBlob } from "@/utils/imageUtils";
 
 const props = defineProps<{
   file?: File | null;
   imageUrl?: string | null;
 }>();
 
+const imageStore = useImageStore();
 const brushSize = ref<string>("20");
 const prompt = ref<string>("");
 const canvas = ref<HTMLCanvasElement | null>(null);
@@ -20,6 +24,15 @@ const saveImage = () => {
   link.click();
 };
 
+const generateNewImage = async () => {
+  const dataUrl = canvas.value?.toDataURL() || "";
+  const blob = dataURLToBlob(dataUrl);
+  const file = new File([blob], "image.png", { type: "image/png" });
+  const imgName = imageStore.name.split(".")[0];
+
+  postImage(file, imgName, false);
+};
+
 const draw = (x: number, y: number) => {
   if (ctx.value) {
     ctx.value.globalCompositeOperation = "destination-out";
@@ -30,6 +43,7 @@ const draw = (x: number, y: number) => {
 };
 
 const image = new Image();
+image.crossOrigin = "anonymous";
 
 if (props.imageUrl) {
   image.src = props.imageUrl;
@@ -110,7 +124,7 @@ onMounted(() => {
         v-model="prompt"
       />
       <div class="flex flex-wrap w-full gap-12">
-        <button class="btn btn-primary flex-1">Generate new image</button>
+        <button class="btn btn-primary flex-1" @click="generateNewImage">Generate new image</button>
         <button class="btn flex-1" @click="saveImage">Save image</button>
       </div>
     </div>
