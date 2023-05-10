@@ -4,6 +4,7 @@ import ImageCanvas from "../components/ImageCanvas.vue";
 import GetImage from "@/components/GetImage.vue";
 import { useImageStore } from "@/stores/image";
 import { getGeneratedImage } from "@/services/images";
+import cryptoRandomString from "crypto-random-string";
 
 const imageStore = useImageStore();
 
@@ -14,7 +15,11 @@ const fileUrl = ref<string | null>(null);
 const handleLoadImage = (event: Event) => {
   file.value = (event.target as HTMLInputElement).files?.[0] as File;
   if (file.value) {
-    imageStore.name = `${file.value.name.split(".")[0]}imageType=base.jpg`;
+    imageStore.name = `${cryptoRandomString({
+      length: 32,
+      type: "alphanumeric"
+    })}imageType=base.png`;
+    console.log(imageStore.name);
     fileState.value = "loaded";
   }
 };
