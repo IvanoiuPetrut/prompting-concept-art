@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import BaseCollapse from "@/components/BaseCollapse.vue";
 
 const props = defineProps<{
   file?: File | null;
   imageUrl?: string | null;
 }>();
 
+const brushSize = ref<string>("20");
+const prompt = ref<string>("");
 const canvas = ref<HTMLCanvasElement | null>(null);
 const ctx = ref<CanvasRenderingContext2D | null>(null);
 let isDrawing = false;
-const brushSize = 20;
 
 const saveImage = () => {
   const link = document.createElement("a");
@@ -22,7 +24,7 @@ const draw = (x: number, y: number) => {
   if (ctx.value) {
     ctx.value.globalCompositeOperation = "destination-out";
     ctx.value.beginPath();
-    ctx.value.arc(x, y, brushSize, 0, 2 * Math.PI);
+    ctx.value.arc(x, y, Number(brushSize.value), 0, 2 * Math.PI);
     ctx.value.fill();
   }
 };
@@ -65,6 +67,7 @@ onMounted(() => {
     canvas.value.addEventListener("mousedown", (e) => {
       if (canvas.value) {
         isDrawing = true;
+        draw(e.offsetX, e.offsetY);
       }
     });
 
@@ -84,13 +87,32 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="grid grid-cols-2 gap-4">
+  <div class="flex flex-col justify-center gap-12 md:flex-row">
     <canvas ref="canvas" class="ring ring-primary ring-offset-base-100 ring-offset-4"></canvas>
-    <div class="flex justify-center gap-4 mt-4">
-      <button class="btn" @click="saveImage">Save</button>
-      <button class="btn" @click="saveImage">Save</button>
-      <button class="btn" @click="saveImage">Save</button>
-      <button class="btn" @click="saveImage">Save</button>
+    <div class="flex flex-col w-full gap-4">
+      <BaseCollapse>
+        <template #header>How to use</template>
+        <template #content>
+          <p>Erase the part you want to change</p>
+          <p>Enter a prompt for what should be in the erased part</p>
+          <p>Generate new iamge or save the actual image</p>
+          <p class="italic mt-2">Is that simple! 😎</p>
+        </template>
+      </BaseCollapse>
+      <div class="flex flex-col gap-4 p-4 bg-base-200">
+        <p class="text-xl text-primary-content">Brush size</p>
+        <input type="range" min="0" max="100" class="range" v-model="brushSize" />
+      </div>
+      <input
+        type="text"
+        placeholder="Enter a prompt"
+        class="input input-bordered w-full text-xl text-primary-content bg-base-200"
+        v-model="prompt"
+      />
+      <div class="flex flex-wrap w-full gap-12">
+        <button class="btn btn-primary flex-1">Generate new image</button>
+        <button class="btn flex-1" @click="saveImage">Save image</button>
+      </div>
     </div>
   </div>
 </template>
