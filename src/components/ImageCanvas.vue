@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import BaseCollapse from "@/components/BaseCollapse.vue";
 import { useImageStore } from "@/stores/image";
-import { postImage } from "@/services/images";
+import { postImage, editImage } from "@/services/images";
 import { dataURLToBlob } from "@/utils/imageUtils";
 
 const props = defineProps<{
@@ -11,6 +11,7 @@ const props = defineProps<{
 }>();
 
 const imageStore = useImageStore();
+const image = ref<HTMLImageElement>(new Image());
 const brushSize = ref<string>("20");
 const prompt = ref<string>("");
 const canvas = ref<HTMLCanvasElement | null>(null);
@@ -25,13 +26,21 @@ const saveImage = () => {
 };
 
 const generateNewImage = async () => {
+  imageStore.state = "loading";
   const dataUrl = canvas.value?.toDataURL() || "";
   const blob = dataURLToBlob(dataUrl);
   const file = new File([blob], "image.png", { type: "image/png" });
 
   const response = await postImage(file, imageStore.name, "mask");
-  console.log(response);
-  // const newIamge = await getEditedImage(prompt.value, imageStore.name.split("-")[0]);
+  let newImage;
+  if (response.status === 200) {
+    newImage = await editImage(prompt.value, imageStore.name);
+    console.log(newImage);
+    imageStore.state = "loaded";
+    imageStore.imageURL = newImage.imageUrl;
+    imageStore.fullName = newImage.imageName;
+  }
+  imageStore.state = "loaded";
 };
 
 const draw = (x: number, y: number) => {
@@ -42,27 +51,6 @@ const draw = (x: number, y: number) => {
     ctx.value.fill();
   }
 };
-
-const image = new Image();
-image.crossOrigin = "anonymous";
-
-if (props.imageUrl) {
-  image.src = props.imageUrl;
-  image.onload = () => {
-    if (ctx.value) {
-      ctx.value.drawImage(image, 0, 0);
-    }
-  };
-}
-
-if (props.file) {
-  image.src = URL.createObjectURL(props.file);
-  image.onload = () => {
-    if (ctx.value) {
-      ctx.value.drawImage(image, 0, 0);
-    }
-  };
-}
 
 onMounted(() => {
   const screenWidth = window.innerWidth;
@@ -87,16 +75,36 @@ onMounted(() => {
     });
 
     canvas.value.addEventListener("mousemove", (e) => {
-      if (canvas.value) {
-        if (isDrawing) {
-          draw(e.offsetX, e.offsetY);
-        }
+      if (canvas.value && isDrawing) {
+        draw(e.offsetX, e.offsetY);
       }
     });
 
     canvas.value.addEventListener("mouseup", () => {
-      isDrawing = false;
+      if (canvas.value) {
+        isDrawing = false;
+      }
     });
+  }
+
+  image.value.crossOrigin = "anonymous";
+
+  if (props.imageUrl) {
+    image.value.src = props.imageUrl;
+    image.value.onload = () => {
+      if (ctx.value) {
+        ctx.value.drawImage(image.value, 0, 0);
+      }
+    };
+  }
+
+  if (props.file) {
+    image.value.src = URL.createObjectURL(props.file);
+    image.value.onload = () => {
+      if (ctx.value) {
+        ctx.value.drawImage(image.value, 0, 0);
+      }
+    };
   }
 });
 </script>

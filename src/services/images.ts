@@ -18,7 +18,6 @@ async function getGeneratedImage(prompt: string): Promise<ImageData> {
       }
     }
   );
-  console.log(data);
   return data;
 }
 
@@ -35,4 +34,17 @@ async function postImage(image: File, imageName: string, imageTopology: string) 
   return response;
 }
 
-export { getGeneratedImage, postImage };
+async function editImage(prompt: string, imageName: string) {
+  const response = await axios.get(
+    `${import.meta.env.VITE_BACKEND_URL}/images/edit/?prompt=${prompt}&imageName=${imageName}`,
+    {
+      headers: {
+        authorization: cookies.get("auth-token")
+      }
+    }
+  );
+
+  return response.data;
+}
+
+export { getGeneratedImage, postImage, editImage };

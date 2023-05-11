@@ -8,16 +8,14 @@ import cryptoRandomString from "crypto-random-string";
 import artFacts from "@/data/artFacts.json";
 import { useImageStore } from "@/stores/image";
 import { getGeneratedImage, postImage } from "@/services/images";
-import { dataURLToBlob } from "@/utils/imageUtils";
+import { imageURLToBlob } from "@/utils/imageUtils";
 
 const imageStore = useImageStore();
 
-const fileState = ref<"not-loaded" | "loading" | "loaded">("not-loaded");
 const file = ref<File | null>(null);
-const fileUrl = ref<string | null>(null);
 
 const handleLoadImage = async (event: Event) => {
-  fileState.value = "loading";
+  imageStore.state = "loading";
   file.value = (event.target as HTMLInputElement).files?.[0] as File;
   if (file.value) {
     imageStore.fullName = `${cryptoRandomString({
@@ -26,31 +24,31 @@ const handleLoadImage = async (event: Event) => {
     })}-imageType=base.png`;
     const response = await postImage(file.value, imageStore.name, "base");
     console.log("add img to S3 from pc", response);
-    fileState.value = "loaded";
+    imageStore.state = "loaded";
   }
 };
 
 async function handleGenerateImage(prompt: string) {
-  fileState.value = "loading";
+  imageStore.state = "loading";
   const { imageUrl, name } = await getGeneratedImage(prompt);
-  console.log(imageUrl, name);
   imageStore.fullName = name;
-  fileUrl.value = imageUrl;
-  const file = new File([dataURLToBlob(imageUrl + ".png")], name, { type: "image/png" });
+  imageStore.imageURL = imageUrl;
+  const blob = await imageURLToBlob(imageUrl);
+  const file = new File([blob], "image.png", { type: "image/png" });
   const response = await postImage(file, imageStore.name, "base");
   console.log("add img to S3 from AI", response);
-  fileState.value = "loaded";
+  imageStore.state = "loaded";
 }
 </script>
 
 <template>
   <div class="mt-16 p-10">
     <GetImage
-      v-if="fileState === 'not-loaded'"
+      v-if="imageStore.state === 'not-loaded'"
       @load-image="handleLoadImage"
       @generate-image="handleGenerateImage"
     />
-    <div v-if="fileState === 'loading'" class="mt-32 lg:px-64">
+    <div v-if="imageStore.state === 'loading'" class="mt-32 lg:px-64">
       <BaseSpinner />
       <FactSection class="mt-12">
         <template #content>
@@ -60,6 +58,10 @@ async function handleGenerateImage(prompt: string) {
         </template>
       </FactSection>
     </div>
-    <ImageCanvas v-if="fileState === 'loaded'" :file="file" :imageUrl="fileUrl" />
+    <ImageCanvas
+      v-if="imageStore.state === 'loaded'"
+      :file="file"
+      :imageUrl="imageStore.imageURL"
+    />
   </div>
 </template>
