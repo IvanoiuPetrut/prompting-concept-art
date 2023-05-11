@@ -28,9 +28,10 @@ const generateNewImage = async () => {
   const dataUrl = canvas.value?.toDataURL() || "";
   const blob = dataURLToBlob(dataUrl);
   const file = new File([blob], "image.png", { type: "image/png" });
-  const imgName = imageStore.name.split(".")[0];
 
-  postImage(file, imgName, false);
+  const response = await postImage(file, imageStore.name, "mask");
+  console.log(response);
+  // const newIamge = await getEditedImage(prompt.value, imageStore.name.split("-")[0]);
 };
 
 const draw = (x: number, y: number) => {

@@ -1,6 +1,7 @@
 function dataURLToBlob(dataUrl: string): Blob {
   const parts = dataUrl.split(";base64,");
   const contentType = parts[0].split(":")[1];
+  console.log(parts[1]);
   const b64 = atob(parts[1]);
   let n = b64.length;
   const u8arr = new Uint8Array(n);

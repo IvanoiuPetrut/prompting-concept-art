@@ -22,19 +22,17 @@ async function getGeneratedImage(prompt: string): Promise<ImageData> {
   return data;
 }
 
-async function postImage(image: File, imageName: string, isMask: boolean) {
+async function postImage(image: File, imageName: string, imageTopology: string) {
   const formData = new FormData();
-  formData.append("imageName", imageName);
-  formData.append("isMask", isMask.toString());
   formData.append("image", image);
-  console.log(formData);
+  formData.append("imageName", `${imageName}-imageType=${imageTopology}`);
   const response = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/images`, formData, {
     headers: {
       authorization: cookies.get("auth-token")
     }
   });
 
-  console.log(response);
+  return response;
 }
 
 export { getGeneratedImage, postImage };

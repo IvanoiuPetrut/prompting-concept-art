@@ -2,8 +2,9 @@ import { ref, computed } from "vue";
 import { defineStore } from "pinia";
 
 export const useImageStore = defineStore("image", () => {
-  const name = ref<string>("");
-  const isMask = computed(() => name.value.includes("imageType=mask"));
+  const fullName = ref<string>("");
+  const name = computed(() => fullName.value.split("-imageType")[0]);
+  const isMask = computed(() => fullName.value.includes("imageType=mask"));
 
-  return { name, isMask };
+  return { fullName, name, isMask };
 });

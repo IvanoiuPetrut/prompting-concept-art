@@ -7,22 +7,25 @@ import FactSection from "@/components/FactSection.vue";
 import cryptoRandomString from "crypto-random-string";
 import artFacts from "@/data/artFacts.json";
 import { useImageStore } from "@/stores/image";
-import { getGeneratedImage } from "@/services/images";
+import { getGeneratedImage, postImage } from "@/services/images";
+import { dataURLToBlob } from "@/utils/imageUtils";
 
 const imageStore = useImageStore();
 
-const fileState = ref<"not-loaded" | "loading" | "loaded">("loading");
+const fileState = ref<"not-loaded" | "loading" | "loaded">("not-loaded");
 const file = ref<File | null>(null);
 const fileUrl = ref<string | null>(null);
 
-const handleLoadImage = (event: Event) => {
+const handleLoadImage = async (event: Event) => {
+  fileState.value = "loading";
   file.value = (event.target as HTMLInputElement).files?.[0] as File;
   if (file.value) {
-    imageStore.name = `${cryptoRandomString({
+    imageStore.fullName = `${cryptoRandomString({
       length: 32,
       type: "alphanumeric"
-    })}imageType=base.png`;
-    console.log(imageStore.name);
+    })}-imageType=base.png`;
+    const response = await postImage(file.value, imageStore.name, "base");
+    console.log("add img to S3 from pc", response);
     fileState.value = "loaded";
   }
 };
@@ -31,8 +34,11 @@ async function handleGenerateImage(prompt: string) {
   fileState.value = "loading";
   const { imageUrl, name } = await getGeneratedImage(prompt);
   console.log(imageUrl, name);
-  imageStore.name = name;
+  imageStore.fullName = name;
   fileUrl.value = imageUrl;
+  const file = new File([dataURLToBlob(imageUrl + ".png")], name, { type: "image/png" });
+  const response = await postImage(file, imageStore.name, "base");
+  console.log("add img to S3 from AI", response);
   fileState.value = "loaded";
 }
 </script>
