@@ -29,7 +29,7 @@ const router = createRouter({
   ]
 });
 
-router.beforeEach(() => {
+router.beforeEach(async (to) => {
   const userCookieStore = useUserCookieStore();
   const authCookie = cookies.get("auth-token");
 
@@ -37,6 +37,15 @@ router.beforeEach(() => {
     userCookieStore.setAuthCookie(authCookie);
   } else {
     userCookieStore.removeAuthCookie();
+  }
+
+  if (
+    !userCookieStore.isUserAuthenticated &&
+    to.name !== "login" &&
+    to.name !== "register" &&
+    to.name !== "home"
+  ) {
+    return { name: "login" };
   }
 });
 
